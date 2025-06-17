@@ -14,11 +14,11 @@ def lambda_handler(event, context):
 
     try:
         conn = psycopg2.connect(
-            host=secret['host'],
-            dbname=secret['dbname'],
+            host=os.environ['DB_HOST'],
+            dbname=os.environ['DB_NAME'],
             user=secret['username'],
             password=secret['password'],
-            port=secret['port']
+            port=os.environ['DB_PORT']
         )
         cur = conn.cursor()
         cur.execute("CALL your_stored_procedure();")
