@@ -21,7 +21,7 @@ def lambda_handler(event, context):
             port=os.environ['DB_PORT']
         )
         cur = conn.cursor()
-        cur.execute("CALL your_stored_procedure();")
+        cur.execute("CALL svc_registration_migration.p_s3translation_all(7, 'motus-dev-data-translation', 2);")
         conn.commit()
         cur.close()
         conn.close()
