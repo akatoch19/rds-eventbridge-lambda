@@ -14,11 +14,11 @@ def lambda_handler(event, context):
 
     try:
         conn = psycopg2.connect(
-            host=os.environ['DB_HOST'],
+            host=secret['host'],
             dbname=os.environ['DB_NAME'],
             user=secret['username'],
             password=secret['password'],
-            port=os.environ['DB_PORT']
+            port=secret['port']
         )
         cur = conn.cursor()
         cur.execute("CALL svc_registration_migration.p_s3translation_all(7, 'motus-dev-data-translation', 2);")

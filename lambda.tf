@@ -27,11 +27,9 @@ resource "aws_lambda_function" "rds_trigger_lambda" {
 
   environment {
     variables = {
-      DB_SECRET_ARN = "arn:aws:secretsmanager:region:account-id:secret:your-secret"
-      AWS_REGION    = "your-region"
-      DB_HOST = var.db_host
+      DB_SECRET_ARN = var.db_secret_arn
+      AWS_REGION    = "us-east-1"
       DB_NAME = var.db_name
-      DB_PORT = var.db_port
 
     }
   }
