@@ -6,6 +6,8 @@ import boto3
 def lambda_handler(event, context):
     secret_name = os.environ['DB_SECRET_ARN']
     region_name = os.environ['AWS_REGION']
+    db_name = os.environ['DB_NAME']
+    stored_proc = os.environ['STORED_PROCEDURE']
 
     # Fetch credentials from Secrets Manager
     session = boto3.session.Session()
@@ -15,17 +17,21 @@ def lambda_handler(event, context):
     try:
         conn = psycopg2.connect(
             host=secret['host'],
-            dbname=os.environ['DB_NAME'],
+            dbname=db_name,
             user=secret['username'],
             password=secret['password'],
             port=secret['port']
         )
         cur = conn.cursor()
-        cur.execute("CALL svc_registration_migration.p_s3translation_all(7, 'motus-dev-data-translation', 2);")
+
+        # Safely execute stored procedure
+        print(f"Executing stored procedure: {stored_proc}")
+        cur.execute(f"CALL {stored_proc};")
+
         conn.commit()
         cur.close()
         conn.close()
-        return {"status": "success"}
+        return {"status": "success", "procedure": stored_proc}
     except Exception as e:
-        print(f"DB Connection failed: {e}")
+        print(f"DB Connection or Execution failed: {e}")
         return {"status": "error", "message": str(e)}
