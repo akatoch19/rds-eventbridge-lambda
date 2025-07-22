@@ -29,6 +29,13 @@ locals {
   ]
 }
 
+data "archive_file" "lambda_package" {
+  type        = "zip"
+  source_file = "${path.module}/lambda.py"
+  output_path = "${path.module}/lambda.zip"
+}
+
+
 resource "aws_lambda_function" "lambda_jobs" {
   count         = 7
   function_name = "stored-proc-job-${count.index + 1}"
@@ -37,7 +44,8 @@ resource "aws_lambda_function" "lambda_jobs" {
   role          = aws_iam_role.lambda_exec.arn
   filename      = "lambda.zip"
   timeout       = 60
-  source_code_hash = filebase64sha256("lambda.zip")
+  filename         = data.archive_file.lambda_package.output_path
+  source_code_hash = data.archive_file.lambda_package.output_base64sha256
 
   environment {
     variables = {
